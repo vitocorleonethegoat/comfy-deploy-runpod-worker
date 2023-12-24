@@ -1,62 +1,23 @@
 {
   "input": {
-    "workflow": {
-      "3": {
+    "status_endpoint": "http://host.docker.internal:3001/api/update-run",
+    "file_upload_endpoint": "http://host.docker.internal:3001/api/file-upload",
+    "workflow_api": {
+      "2": {
         "inputs": {
-          "seed": 234234,
-          "steps": 20,
-          "cfg": 8,
-          "sampler_name": "euler",
-          "scheduler": "normal",
-          "denoise": 1,
-          "model": ["4", 0],
-          "positive": ["6", 0],
-          "negative": ["7", 0],
-          "latent_image": ["5", 0]
+          "images": [
+            "4",
+            0
+          ],
+          "filename_prefix": "ComfyUI"
         },
-        "class_type": "KSampler"
+        "class_type": "SaveImage"
       },
       "4": {
         "inputs": {
-          "ckpt_name": "sd_xl_base_1.0.safetensors"
+          "input_id": "https://cdn.discordapp.com/attachments/1119102674437156984/1188147865533554738/CleanShot_2023-12-23_at_23.55.202x.png?ex=659977ed&is=658702ed&hm=bd1dbe1065699a413ec82ca494a576d3ff9583cd001113ecd7ec33fa0a7c7dd6&"
         },
-        "class_type": "CheckpointLoaderSimple"
-      },
-      "5": {
-        "inputs": {
-          "width": 512,
-          "height": 512,
-          "batch_size": 1
-        },
-        "class_type": "EmptyLatentImage"
-      },
-      "6": {
-        "inputs": {
-          "text": "beautiful scenery nature glass bottle landscape, purple galaxy bottle,",
-          "clip": ["4", 1]
-        },
-        "class_type": "CLIPTextEncode"
-      },
-      "7": {
-        "inputs": {
-          "text": "text, watermark",
-          "clip": ["4", 1]
-        },
-        "class_type": "CLIPTextEncode"
-      },
-      "8": {
-        "inputs": {
-          "samples": ["3", 0],
-          "vae": ["4", 2]
-        },
-        "class_type": "VAEDecode"
-      },
-      "9": {
-        "inputs": {
-          "filename_prefix": "ComfyUI",
-          "images": ["8", 0]
-        },
-        "class_type": "SaveImage"
+        "class_type": "ComfyUIDeployExternalImage"
       }
     }
   }
