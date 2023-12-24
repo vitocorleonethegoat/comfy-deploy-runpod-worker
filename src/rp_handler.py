@@ -47,23 +47,25 @@ def validate_input(job_input):
             return None, "Invalid JSON format in input"
 
     # Validate 'workflow' in input
-    workflow = job_input.get("workflow")
+    workflow = job_input.get("workflow_api")
     if workflow is None:
-        return None, "Missing 'workflow' parameter"
+        return None, "Missing 'workflow_api' parameter"
 
-    # Validate 'images' in input, if provided
-    images = job_input.get("images")
-    if images is not None:
-        if not isinstance(images, list) or not all(
-            "name" in image and "image" in image for image in images
-        ):
-            return (
-                None,
-                "'images' must be a list of objects with 'name' and 'image' keys",
-            )
+    return job_input, None
+
+    # # Validate 'images' in input, if provided
+    # images = job_input.get("images")
+    # if images is not None:
+    #     if not isinstance(images, list) or not all(
+    #         "name" in image and "image" in image for image in images
+    #     ):
+    #         return (
+    #             None,
+    #             "'images' must be a list of objects with 'name' and 'image' keys",
+    #         )
 
     # Return validated data and no error
-    return {"workflow": workflow, "images": images}, None
+    # return {"workflow": workflow, "images": images}, None
 
 
 def check_server(url, retries=50, delay=500):
@@ -170,6 +172,16 @@ def queue_workflow(workflow):
     req = urllib.request.Request(f"http://{COMFY_HOST}/prompt", data=data)
     return json.loads(urllib.request.urlopen(req).read())
 
+
+def queue_workflow_comfy_deploy(data):
+    data_str = json.dumps(data)
+    data_bytes = data_str.encode('utf-8') 
+    req = urllib.request.Request(f"http://{COMFY_HOST}/comfyui-deploy/run", data=data_bytes)
+    return json.loads(urllib.request.urlopen(req).read())
+
+def check_status(prompt_id):
+    req = urllib.request.Request(f"http://{COMFY_HOST}/comfyui-deploy/check-status?prompt_id={prompt_id}")
+    return json.loads(urllib.request.urlopen(req).read())
 
 def get_history(prompt_id):
     """
@@ -294,8 +306,8 @@ def handler(job):
         return {"error": error_message}
 
     # Extract validated data
-    workflow = validated_data["workflow"]
-    images = validated_data.get("images")
+    # workflow = validated_data["workflow"]
+    # images = validated_data.get("images")
 
     # Make sure that the ComfyUI API is available
     check_server(
@@ -305,28 +317,38 @@ def handler(job):
     )
 
     # Upload images if they exist
-    upload_result = upload_images(images)
+    # upload_result = upload_images(images)
 
-    if upload_result["status"] == "error":
-        return upload_result
+    # if upload_result["status"] == "error":
+    #     return upload_result
 
     # Queue the workflow
     try:
-        queued_workflow = queue_workflow(workflow)
+        # job_input is the json input
+        queued_workflow = queue_workflow_comfy_deploy(job_input) # queue_workflow(workflow)
         prompt_id = queued_workflow["prompt_id"]
         print(f"runpod-worker-comfy - queued workflow with ID {prompt_id}")
     except Exception as e:
+        import traceback
+        print(traceback.format_exc())
         return {"error": f"Error queuing workflow: {str(e)}"}
 
     # Poll for completion
     print(f"runpod-worker-comfy - wait until image generation is complete")
     retries = 0
+    status = ""
     try:
         while retries < COMFY_POLLING_MAX_RETRIES:
-            history = get_history(prompt_id)
+            status_result = check_status(prompt_id=prompt_id)
+            # history = get_history(prompt_id)
 
             # Exit the loop if we have found the history
-            if prompt_id in history and history[prompt_id].get("outputs"):
+            # if prompt_id in history and history[prompt_id].get("outputs"):
+            #     break
+
+            # Exit the loop if we have found the status both success or failed
+            if 'status' in status_result and (status_result['status'] == 'success' or status_result['status'] == 'failed'):
+                status = status_result['status']
                 break
             else:
                 # Wait before trying again
@@ -338,9 +360,9 @@ def handler(job):
         return {"error": f"Error waiting for image generation: {str(e)}"}
 
     # Get the generated image and return it as URL in an AWS bucket or as base64
-    images_result = process_output_images(history[prompt_id].get("outputs"), job["id"])
-
-    result = {**images_result, "refresh_worker": REFRESH_WORKER}
+    # images_result = process_output_images(history[prompt_id].get("outputs"), job["id"])
+    # result = {**images_result, "refresh_worker": REFRESH_WORKER}
+    result = { "status": status, "refresh_worker": REFRESH_WORKER }
 
     return result
 
