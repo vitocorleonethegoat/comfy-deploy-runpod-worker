@@ -26,6 +26,8 @@ RUN cd /comfyui && git reset --hard b12b48e170ccff156dc6ec11242bb6af7d8437fd
 # Change working directory to ComfyUI
 WORKDIR /comfyui
 
+# Unisntall torch, torchvision and torchaudio, to ensure that the correct version is installed via index url
+RUN pip3 uninstall -y torch torchvision torchaudio
 # Install ComfyUI dependencies
 RUN pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121 \
     && pip3 install --no-cache-dir xformers==0.0.21 \
@@ -52,6 +54,8 @@ RUN git clone --depth 1 https://github.com/BennyKok/comfyui-deploy.git
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 
+ADD src/install_deps.py src/deps.json ./
+RUN python3 install_deps.py
 # Go back to the root
 WORKDIR /
 
