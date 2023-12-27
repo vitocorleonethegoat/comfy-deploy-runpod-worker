@@ -55,8 +55,6 @@ RUN git clone --depth 1 https://github.com/BennyKok/comfyui-deploy.git
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 
-ADD src/install_deps.py src/deps.json ./
-RUN python3 install_deps.py
 # Go back to the root
 WORKDIR /
 
