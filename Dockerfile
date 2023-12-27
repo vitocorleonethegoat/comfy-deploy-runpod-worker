@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     git \
     wget
 
+# Impact pack deps
+RUN apt-get install -y libgl1-mesa-glx libglib2.0-0
+
 # Clean up to reduce image size
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
@@ -26,12 +29,10 @@ RUN cd /comfyui && git reset --hard b12b48e170ccff156dc6ec11242bb6af7d8437fd
 # Change working directory to ComfyUI
 WORKDIR /comfyui
 
-# Unisntall torch, torchvision and torchaudio, to ensure that the correct version is installed via index url
-RUN pip3 uninstall -y torch torchvision torchaudio
 # Install ComfyUI dependencies
-RUN pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121 \
-    && pip3 install --no-cache-dir xformers==0.0.21 \
-    && pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install --no-cache-dir xformers==0.0.23 --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install -r requirements.txt
 
 # Install runpod
 RUN pip3 install runpod requests
@@ -58,6 +59,10 @@ ADD src/install_deps.py src/deps.json ./
 RUN python3 install_deps.py
 # Go back to the root
 WORKDIR /
+
+# RUN git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale --recursive
+ADD src/install_deps.py src/deps.json ./
+RUN python3 install_deps.py
 
 # Add the start and the handler
 ADD src/start.sh src/rp_handler.py test_input.json ./
