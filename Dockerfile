@@ -30,7 +30,7 @@ RUN cd /comfyui && git reset --hard b12b48e170ccff156dc6ec11242bb6af7d8437fd
 WORKDIR /comfyui
 
 # Install ComfyUI dependencies
-RUN pip3 install --no-cache-dir torch==2.1.0 torchvision==0.16.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+RUN pip3 install --no-cache-dir torch==2.1.1 torchvision==0.16.1 torchaudio==2.1.1 --index-url https://download.pytorch.org/whl/cu121
 RUN pip3 install --no-cache-dir xformers==0.0.23 --index-url https://download.pytorch.org/whl/cu121
 RUN pip3 install -r requirements.txt
 
@@ -54,6 +54,10 @@ WORKDIR /comfyui/custom_nodes
 RUN git clone --depth 1 https://github.com/BennyKok/comfyui-deploy.git
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
+
+WORKDIR /comfyui
+
+ADD src/extra_model_paths.yaml ./
 
 # Go back to the root
 WORKDIR /
