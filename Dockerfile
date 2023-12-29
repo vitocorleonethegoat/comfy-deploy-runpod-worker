@@ -51,7 +51,7 @@ RUN pip3 install runpod requests
 
 WORKDIR /comfyui/custom_nodes
 
-RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard d9f83dadd1acf36133a2e81301488a2b1672ffb4
+RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard 6b99b8a66adc5fb17b42508dea3f9814f08f81a6
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 
