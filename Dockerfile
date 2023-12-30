@@ -51,7 +51,6 @@ RUN pip3 install runpod requests
 
 WORKDIR /comfyui/custom_nodes
 
-RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard 824ce16b4e7fd89d8ce309428cff32e08b581633
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 
@@ -65,6 +64,12 @@ WORKDIR /
 # RUN git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale --recursive
 ADD src/install_deps.py src/deps.json ./
 RUN python3 install_deps.py
+
+WORKDIR /comfyui/custom_nodes
+
+RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard 744a222e2652014e4d09af6b54fc11263b15e2f7
+
+WORKDIR /
 
 # Add the start and the handler
 ADD src/start.sh src/rp_handler.py test_input.json ./
