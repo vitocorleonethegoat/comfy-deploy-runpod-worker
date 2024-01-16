@@ -67,7 +67,7 @@ RUN python3 install_deps.py
 
 WORKDIR /comfyui/custom_nodes
 
-RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard fa2638f66d7670c7e9d101eb36a20e9f82c9eb50
+RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deploy && git reset --hard 8628480362512644463729c38c602a1ef07d1bd5
 
 WORKDIR /
 
