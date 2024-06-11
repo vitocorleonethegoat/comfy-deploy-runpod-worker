@@ -42,6 +42,8 @@ RUN pip3 install runpod requests
 # RUN wget -O models/vae/sdxl_vae.safetensors https://huggingface.co/stabilityai/sdxl-vae/resolve/main/sdxl_vae.safetensors
 # RUN wget -O models/vae/sdxl-vae-fp16-fix.safetensors https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors
 # RUN wget -O models/loras/xl_more_art-full_v1.safetensors https://civitai.com/api/download/models/152309
+RUN wget -0 models/checkpoints/Juggernaut_X_RunDiffusion.safetensors https://civitai.com/api/download/models/456194
+RUN wget -0 models/loras/sdxl_lightning_8step_lora.safetensors https://huggingface.co/ByteDance/SDXL-Lightning/resolve/main/sdxl_lightning_8step_lora.safetensors?download=true
 
 # Example for adding specific models into image
 # ADD models/checkpoints/sd_xl_base_1.0.safetensors models/checkpoints/
@@ -71,6 +73,22 @@ RUN git clone https://github.com/BennyKok/comfyui-deploy.git && cd comfyui-deplo
 RUN cd comfyui-deploy && pip3 install -r requirements.txt
 
 WORKDIR /
+
+RUN apt-get update && apt-get install build-essential
+
+
+WORKDIR /comfyui/custom_nodes
+
+RUN git clone https://github.com/mav-rik/facerestore_cf.git
+RUN cd facerestore_cf && pip3 install -r requirements.txt
+
+RUN git clone https://github.com/palant/extended-saveimage-comfyui.git  
+
+RUN git clone https://github.com/Gourieff/comfyui-reactor-node.git
+RUN cd comfyui-reactor-node && install.bat
+
+WORKDIR /
+
 
 # Add the start and the handler
 ADD src/start.sh src/rp_handler.py test_input.json ./
