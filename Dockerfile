@@ -85,7 +85,7 @@ RUN cd facerestore_cf && pip3 install -r requirements.txt
 RUN git clone https://github.com/palant/extended-saveimage-comfyui.git  
 
 RUN git clone https://github.com/Gourieff/comfyui-reactor-node.git
-RUN cd comfyui-reactor-node && install.bat
+RUN cd comfyui-reactor-node && install.sh
 
 WORKDIR /
 
